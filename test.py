@@ -83,12 +83,12 @@ memory = ReplayBuffer(action_size, memory_params['buffer_size'],
                       memory_params['batch_size'], memory_params['seed'], torch_device)
 
 # Test
-ddpg_agents = [MADDPGAgent(state_size, action_size, memory, torch_device, params)
+maddpg_agents = [MADDPGAgent(state_size, action_size, memory, torch_device, params)
                for _ in range(num_agents)]
 
-for agent in ddpg_agents:
-    agent.load_weights(["model_ddpg_actor.pth", "model_ddpg_critic.pth"])
+for agent in maddpg_agents:
+    agent.load_weights(["model_maddpg_actor.pth", "model_maddpg_critic.pth"])
 
-test(ddpg_agents)
+test(maddpg_agents)
 
 env.close()

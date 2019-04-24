@@ -174,7 +174,7 @@ memory = ReplayBuffer(action_size, memory_params['buffer_size'],
 maddpg_agents = [MADDPGAgent(state_size, action_size, memory, torch_device, params)
                for _ in range(num_agents)]
 
-maddpg_scores = train(300, 5000, maddpg_agents, ["model_ddpg_actor.pth", "model_ddpg_critic.pth"],
+maddpg_scores = train(300, 5000, maddpg_agents, ["model_maddpg_actor.pth", "model_madpg_critic.pth"],
                     benchmark_score, rolling_n_episodes)
 
 plot_scores(maddpg_scores, benchmark_score, rolling_n_episodes)
@@ -184,7 +184,7 @@ maddpg_agents = [MADDPGAgent(state_size, action_size, memory, torch_device, para
                for _ in range(num_agents)]
 
 for agent in maddpg_agents:
-    agent.load_weights(["model_ddpg_actor.pth", "model_ddpg_critic.pth"])
+    agent.load_weights(["model_maddpg_actor.pth", "model_maddpg_critic.pth"])
 
 test(maddpg_agents)
 
