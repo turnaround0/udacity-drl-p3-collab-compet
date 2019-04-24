@@ -60,3 +60,43 @@ You need only select the environment that matches your operating system:
 Then, place the file in the `p3_collab-compet/` folder in the DRLND GitHub repository, and unzip (or decompress) the file.  Next, open `Soccer.ipynb` and follow the instructions to learn how to use the Python API to control the agent.
 
 (_For AWS_) If you'd like to train the agents on AWS (and have not [enabled a virtual screen](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Training-on-Amazon-Web-Service.md)), then please use [this link](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P3/Soccer/Soccer_Linux_NoVis.zip) to obtain the "headless" version of the environment.  You will **not** be able to watch the agents without enabling a virtual screen, but you will be able to train the agents.  (_To watch the agents, you should follow the instructions to [enable a virtual screen](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Training-on-Amazon-Web-Service.md), and then download the environment for the **Linux** operating system above._)
+
+### Environment
+#### Install drlnd environment
+1. Create (and activate) a new environment with Python 3.6.
+```console
+$ conda create --name drlnd python=3.6
+$ source activate drlnd
+```
+
+2. Follow the instructions in this repository to perform a minimal install of [OpenAI gym](https://github.com/openai/gym).
+```console
+$ pip install gym
+```
+
+On Ubuntu 18.04:
+```console
+$ sudo apt install -y python3-dev zlib1g-dev libjpeg-dev cmake swig python-pyglet python3-opengl \
+    libboost-all-dev libsdl2-dev libosmesa6-dev patchelf ffmpeg xvfb
+```
+
+3. Clone the repository (if you haven't already!), and navigate to the python/ folder.
+   Then, install several dependencies.
+```console
+$ git clone https://github.com/udacity/deep-reinforcement-learning.git
+$ cd deep-reinforcement-learning/python
+$ pip install .
+```
+
+4. Create an IPython kernel for the drlnd environment.
+```console
+$ python -m ipykernel install --user --name drlnd --display-name "drlnd"
+```
+
+5. Before running code in a notebook, change the kernel to match the drlnd environment
+   by using the drop-down Kernel menu.
+
+### Files
+1. Jupyter notebook: Tennis.ipynb
+2. Console training file: train.py
+3. Report: report.md
