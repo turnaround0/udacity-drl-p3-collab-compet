@@ -24,10 +24,10 @@ memory_params = {
 
 params = {
     'gamma': 0.99,                      # discount factor
-    'tau': 1e-3,                        # for soft update of target parameters
+    'tau': 0.15,                        # for soft update of target parameters
     'update_every': 1,                  # update parameters per this number
-    'lr_actor': 1e-4,                   # learning rate of the Actor
-    'lr_critic': 1e-3,                  # learning rate of the Critic
+    'lr_actor': 7e-4,                   # learning rate of the Actor
+    'lr_critic': 3e-3,                  # learning rate of the Critic
     'seed': 0,                          # Seed to generate random numbers
     'actor_units': [512, 256],          # Number of nodes in hidden layers of the Actor
     'critic_units': [512, 256],         # Number of nodes in hidden layers of the Critic
@@ -39,6 +39,10 @@ params = {
 # Parameters to store and plot scores
 rolling_n_episodes = 10         # Score is checked whenever number of tries reachs to this.
 benchmark_score = 0.5           # Score of agent should be over this score
+
+# Filenames of weights of Actor/Critic
+actor_filename = 'model_maddpg_actor'
+critic_filename = 'model_maddpg_critic'
 
 
 def train(n_episodes=400, max_t=5000, agents=None, filenames=None,
@@ -56,7 +60,7 @@ def train(n_episodes=400, max_t=5000, agents=None, filenames=None,
     """
     start_time = time.time()
         
-    all_agent_scores = []                             # list containing scores from each episode for all agents
+    all_scores = []                                   # list containing scores from each episode for all agents
     scores_window = deque(maxlen=rolling_n_episodes)  # last rolling_n_episodes scores
     avg_checked = False
     
@@ -83,15 +87,15 @@ def train(n_episodes=400, max_t=5000, agents=None, filenames=None,
             if np.any(dones):                              # exit loop if episode finished
                 break
 
-        avg_score = np.mean(scores)                        # average score of all agents
-        scores_window.append(avg_score)                    # save most recent score
-        all_agent_scores.append(avg_score)                 # save most recent score
+        max_score = np.max(scores)                         # average score of all agents
+        scores_window.append(max_score)                    # save most recent score
+        all_scores.append(max_score)                       # save all scores
         avg_scores_window = np.mean(scores_window)         # get average score of current window
 
-        print('\rEpisode {}\tAverage Score: {:.5f}'.format(i_episode, avg_scores_window), end="")
+        print('\rEpisode {}\tAverage Score: {:.5f}\tScore: {:.5f}'.format(i_episode, avg_scores_window, max_score), end="")
         
         if i_episode % rolling_n_episodes == 0:
-            print('\rEpisode {}\tAverage Score: {:.5f}'.format(i_episode, avg_scores_window))
+            print('\rEpisode {}\tAverage Score: {:.5f}                '.format(i_episode, avg_scores_window))
         
         if not avg_checked and avg_scores_window >= benchmark_score:
             print('\nEnvironment solved in {:d} episodes!\tAverage Score: {:.5f}'.format(
@@ -99,10 +103,13 @@ def train(n_episodes=400, max_t=5000, agents=None, filenames=None,
             avg_checked = True
 
     print('\nTraining time = {:.5f}s'.format(time.time() - start_time))
-    if filenames:
-        agent.store_weights(filenames)
 
-    return all_agent_scores
+    if filenames:
+        for i, agent in enumerate(agents):
+            agent.store_actor_weights(filenames[0] + str(i) + '.pth')
+        agent.store_critic_weights(filenames[1] + '.pth')
+
+    return all_scores
 
 
 def test(agents, max_t=5000):
@@ -121,7 +128,7 @@ def test(agents, max_t=5000):
         if np.any(dones):                              # exit loop if episode finished
             break
     
-    print('Score: {:.5f}'.format(np.mean(scores)))
+    print('Score: {:.5f}'.format(np.max(scores)))
 
 
 def plot_scores(scores, benchmark_score, rolling_n_episodes):
@@ -174,8 +181,8 @@ memory = ReplayBuffer(action_size, memory_params['buffer_size'],
 maddpg_agents = [MADDPGAgent(state_size, action_size, memory, torch_device, params)
                  for _ in range(num_agents)]
 
-maddpg_scores = train(1000, 5000, maddpg_agents, ["model_maddpg_actor.pth", "model_maddpg_critic.pth"],
-                    benchmark_score, rolling_n_episodes)
+maddpg_scores = train(100, 5000, maddpg_agents, [actor_filename, critic_filename],
+                      benchmark_score, rolling_n_episodes)
 
 plot_scores(maddpg_scores, benchmark_score, rolling_n_episodes)
 
@@ -183,8 +190,9 @@ plot_scores(maddpg_scores, benchmark_score, rolling_n_episodes)
 maddpg_agents = [MADDPGAgent(state_size, action_size, memory, torch_device, params)
                  for _ in range(num_agents)]
 
-for agent in maddpg_agents:
-    agent.load_weights(["model_maddpg_actor.pth", "model_maddpg_critic.pth"])
+for i, agent in enumerate(maddpg_agents):
+    agent.load_actor_weights(actor_filename + str(i) + '.pth')
+    agent.load_critic_weights(critic_filename + '.pth')
 
 test(maddpg_agents)
 

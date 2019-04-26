@@ -20,10 +20,10 @@ memory_params = {
 
 params = {
     'gamma': 0.99,                      # discount factor
-    'tau': 1e-3,                        # for soft update of target parameters
+    'tau': 0.15,                        # for soft update of target parameters
     'update_every': 1,                  # update parameters per this number
-    'lr_actor': 7e-5,                   # learning rate of the Actor
-    'lr_critic': 1e-4,                  # learning rate of the Critic
+    'lr_actor': 7e-4,                   # learning rate of the Actor
+    'lr_critic': 3e-3,                  # learning rate of the Critic
     'seed': 0,                          # Seed to generate random numbers
     'actor_units': [512, 256],          # Number of nodes in hidden layers of the Actor
     'critic_units': [512, 256],         # Number of nodes in hidden layers of the Critic
@@ -31,6 +31,10 @@ params = {
     'noise_theta': 0.15,                # Theta of Ornstein-Uhlenbeck process
     'noise_sigma': 0.01,                # Sigma of Ornstein-Uhlenbeck process
 }
+
+# Filenames of weights of Actor/Critic
+actor_filename = 'model_maddpg_actor'
+critic_filename = 'model_maddpg_critic'
 
 
 def test(agents, max_t=5000):
@@ -49,7 +53,7 @@ def test(agents, max_t=5000):
         if np.any(dones):                              # exit loop if episode finished
             break
     
-    print('Score: {:.2f}'.format(np.mean(scores)))
+    print('Score: {:.5f}'.format(np.max(scores)))
 
 # Select environment of Reacher
 env = UnityEnvironment(file_name=tennis_filename)
@@ -84,10 +88,11 @@ memory = ReplayBuffer(action_size, memory_params['buffer_size'],
 
 # Test
 maddpg_agents = [MADDPGAgent(state_size, action_size, memory, torch_device, params)
-               for _ in range(num_agents)]
+                 for _ in range(num_agents)]
 
-for agent in maddpg_agents:
-    agent.load_weights(["model_maddpg_actor.pth", "model_maddpg_critic.pth"])
+for i, agent in enumerate(maddpg_agents):
+    agent.load_actor_weights(actor_filename + str(i) + '.pth')
+    agent.load_critic_weights(critic_filename + '.pth')
 
 test(maddpg_agents)
 
