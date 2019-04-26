@@ -14,6 +14,9 @@ from noise import OUNoise
 
 class MADDPGAgent():
     """Interacts with and learns from the environment."""
+    critic_local = None
+    critic_target = None
+    critic_optimizer = None
     
     def __init__(self, state_size, action_size, memory, device='cpu', params=None):
         """Initialize an Agent object.
@@ -45,12 +48,19 @@ class MADDPGAgent():
         self.actor_optimizer = optim.Adam(self.actor_local.parameters(), lr=params['lr_actor'])
 
         # Critic Network (w/ Target Network)
-        self.critic_local = Critic(state_size, action_size, params['seed'],
-                                   params['critic_units'][0], params['critic_units'][1]).to(device)
-        self.critic_target = Critic(state_size, action_size, params['seed'],
-                                    params['critic_units'][0], params['critic_units'][1]).to(device)
-        self.critic_optimizer = optim.Adam(self.critic_local.parameters(),
-                                           lr=params['lr_critic'], weight_decay=params['weight_decay'])
+        if not MADDPGAgent.critic_local:
+            MADDPGAgent.critic_local = Critic(state_size, action_size, params['seed'],
+                                              params['critic_units'][0], params['critic_units'][1]).to(device)
+        if not MADDPGAgent.critic_target:
+            MADDPGAgent.critic_target = Critic(state_size, action_size, params['seed'],
+                                               params['critic_units'][0], params['critic_units'][1]).to(device)
+        if not MADDPGAgent.critic_optimizer:
+            MADDPGAgent.critic_optimizer = optim.Adam(self.critic_local.parameters(),
+                                                      lr=params['lr_critic'], weight_decay=params['weight_decay'])
+
+        self.critic_local = MADDPGAgent.critic_local
+        self.critic_target = MADDPGAgent.critic_target
+        self.critic_optimizer = MADDPGAgent.critic_optimizer
 
         # Noise process
         self.noise = OUNoise(action_size, params['seed'], theta=params['noise_theta'], sigma=params['noise_sigma'])
@@ -58,29 +68,41 @@ class MADDPGAgent():
         # Replay memory
         self.memory = memory
 
-    def store_weights(self, filenames):
-        """Store weights of Actor/Critic
+    def store_actor_weights(self, filename):
+        """Store weights of Actor
 
         Params
         ======
-            filenames (list): string of filename to store weights of actor and critic
-                              filenames[0] = actor weights
-                              filenames[1] = critic weights
+            filename (str): string of filename to store weights of actor
         """
-        torch.save(self.actor_local.state_dict(), filenames[0])
-        torch.save(self.critic_local.state_dict(), filenames[1])
+        torch.save(self.actor_local.state_dict(), filename)
 
-    def load_weights(self, filenames):
-        """Load weights of Actor/Critic
+    def store_critic_weights(self, filename):
+        """Store weights of Critic
 
         Params
         ======
-            filenames (list): string of filename to load weights of actor and critic
-                              filenames[0] = actor weights
-                              filenames[1] = critic weights
+            filename (str): string of filename to store weights of critic
         """
-        self.actor_local.load_state_dict(torch.load(filenames[0]))
-        self.critic_local.load_state_dict(torch.load(filenames[1]))
+        torch.save(self.critic_local.state_dict(), filename)
+
+    def load_actor_weights(self, filename):
+        """Load weights of Actor
+
+        Params
+        ======
+            filename (str): string of filename to load weights of actor
+        """
+        self.actor_local.load_state_dict(torch.load(filename))
+
+    def load_critic_weights(self, filename):
+        """Load weights of Critic
+
+        Params
+        ======
+            filename (str): string of filename to load weights of critic
+        """
+        self.critic_local.load_state_dict(torch.load(filename))
 
     def step(self, state, action, reward, next_state, done):
         """Save experience in replay memory, and use random sample from buffer to learn."""
