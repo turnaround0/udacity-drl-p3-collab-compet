@@ -55,7 +55,7 @@ def test(agents, max_t=5000):
     
     print('Score: {:.5f}'.format(np.max(scores)))
 
-# Select environment of Reacher
+# Select environment of Tennis
 env = UnityEnvironment(file_name=tennis_filename)
 
 # get the default brain
