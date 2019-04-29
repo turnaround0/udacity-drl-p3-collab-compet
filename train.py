@@ -150,7 +150,7 @@ def plot_scores(scores, benchmark_score, rolling_n_episodes):
     
     plt.show()
 
-# Select environment of Reacher
+# Select environment of Tennis
 env = UnityEnvironment(file_name=tennis_filename)
 
 # get the default brain
