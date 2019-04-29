@@ -31,10 +31,11 @@ params = {
 I tried several learning rates for Actor and Critic among [1e-2, 3e-3, 1e-3, 7e-4, 3e-4, 1e-4].<br>
 From those tests, 7e-4(lr of Actor) and 3e-3(lr of Critic) were best.<br>
 
-Also, I tuned number of nodes in layers of Actor and Critic among [(1024, 512), (512, 256), (128, 64)]. (512, 256) was best.<br>
+Also, I tuned number of nodes in layers of Actor and Critic among [(1024, 512), (512, 256), (128, 64)].<br>
+(512, 256) was best.<br>
 
 Sigma of Ornstein-Uhlenbeck process was one of critical points.<br>
-I already found it on previous Reacher project, and tested sigma with [0.2, 0.1, 0.01, 0.001].
+I already found it on previous Reacher project, and tested sigma with [0.2, 0.1, 0.01, 0.001].<br>
 0.01 was best for this environment.<br>
 
 I adjusted tau significantly for fast learning.<br>
