@@ -40,7 +40,9 @@ I already found it on previous Reacher project, and tested sigma with [0.2, 0.1,
 
 I adjusted tau significantly for fast learning.<br>
 The test started from tau = 0.001, but I cannot see any learning progress under 500 tries.<br>
-I tested tau with [0.3, 0.2, 0.15, 0.1, 0.01, 0.001], tau = 0.15 made earliest to reach on 0.5 score.<br>
+I tested tau with [0.3, 0.2, 0.15, 0.1, 0.01, 0.001],<br>
+tau = 0.15 made earliest to reach on 0.5 score after 53 episodes.<br>
+With tau = 0.01, it reached on 0.5 score after 254 episodes.
 
 
 ### Model architectures
